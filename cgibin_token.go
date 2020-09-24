@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/liqiongtao/goo"
-	"log"
 	"time"
 )
 
@@ -39,13 +38,15 @@ func (this *cgiToken) Set() error {
 	}{}
 
 	if err := json.Unmarshal(buf, &rsp); err != nil {
-		log.Println(err.Error())
+		goo.Log.Error("[wx-cgi-access-token]", err.Error())
 		return err
 	}
 	if errCode := rsp.ErrCode; errCode != 0 {
-		log.Println(rsp.ErrMsg)
+		goo.Log.Error("[wx-cgi-access-token]", rsp.ErrMsg)
 		return errors.New(rsp.ErrMsg)
 	}
+
+	goo.Log.Debug("[wx-cgi-access-token]", rsp)
 
 	key := fmt.Sprintf(cgi_token_key, this.Appid)
 	return __cache.Set(key, rsp.AccessToken, time.Duration(rsp.ExpiresIn)*time.Second).Err()

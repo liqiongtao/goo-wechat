@@ -24,16 +24,21 @@ func JsCode2Session(appid, secret, code string) (*JsCode2SessionResponse, error)
 	jscode2sess_url := fmt.Sprintf(sns_jsscode2sess_url, appid, secret, code)
 	buf, err := goo.NewRequest().Get(jscode2sess_url)
 	if err != nil {
+		goo.Log.Error("[wx-jscode2sess]", err.Error())
 		return nil, err
 	}
 
 	rsp := &JsCode2SessionResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
+		goo.Log.Error("[wx-jscode2sess]", err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
+		goo.Log.Error("[wx-jscode2sess]", rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
+
+	goo.Log.Error("[wx-jscode2sess]", rsp)
 
 	return rsp, nil
 }
@@ -59,13 +64,17 @@ func MinipUserInfo(sessionKey, encryptedData, iv string) (*MinipUserInfoResponse
 
 	buf, err := utils.AESCBCEncrypt(data, key, utils.Base64Decode(iv))
 	if err != nil {
+		goo.Log.Error("[wx-mini-user]", err.Error())
 		return nil, err
 	}
 
 	userInfo := &MinipUserInfoResponse{}
 	if err = json.Unmarshal(buf, userInfo); err != nil {
+		goo.Log.Error("[wx-mini-user]", err.Error())
 		return nil, err
 	}
+
+	goo.Log.Error("[wx-mini-user]", userInfo)
 
 	return userInfo, nil
 }
@@ -90,6 +99,7 @@ func SendTemplateMessage(appid, secret, openid, templateId, page, formId string,
 	messageTplSendUrl := fmt.Sprintf(message_tpl_send_url, accessToken)
 	buf, err := goo.NewRequest().JsonContentType().Post(messageTplSendUrl, buf)
 	if err != nil {
+		goo.Log.Error("[wx-send-tpl-msg]", err.Error())
 		return err
 	}
 
@@ -98,9 +108,11 @@ func SendTemplateMessage(appid, secret, openid, templateId, page, formId string,
 		ErrMsg  string `json:"errmsg"`
 	}{}
 	if err := json.Unmarshal(buf, rst); err != nil {
+		goo.Log.Error("[wx-send-tpl-msg]", err.Error())
 		return err
 	}
 	if rst.ErrCode != 0 {
+		goo.Log.Error("[wx-send-tpl-msg]", err.Error())
 		return errors.New(rst.ErrMsg)
 	}
 

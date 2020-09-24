@@ -45,6 +45,8 @@ func (this *cgiTicket) Set() error {
 		return errors.New(rsp.ErrMsg)
 	}
 
+	goo.Log.Debug("[wx-cgi-ticket]", rsp)
+
 	key := fmt.Sprintf(cgi_ticket_key, this.Appid)
 	return __cache.Set(key, rsp.Ticket, time.Duration(rsp.ExpiresIn)*time.Second).Err()
 }

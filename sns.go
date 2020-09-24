@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/liqiongtao/goo"
-	"log"
 	"net/url"
 	"strings"
 	"time"
@@ -22,7 +21,7 @@ func Oauth2AuthorizeUrl(appid, authorizeUrl, originUrl string) string {
 		redirectUrl = url.QueryEscape(authorizeUrl + "?redirect_url=" + url.QueryEscape(originUrl))
 	}
 	oauth2Url := fmt.Sprintf(oauth2_authorize_url, appid, redirectUrl, state)
-	log.Println("wx-h5-oauth2", map[string]interface{}{
+	goo.Log.Debug("[wx-h5-oauth2]", map[string]interface{}{
 		"authorizeUrl": authorizeUrl,
 		"originUrl":    originUrl,
 		"redirectUrl":  redirectUrl,
@@ -46,16 +45,21 @@ func Oauth2AccessToken(appid, secret, code string) (*Oauth2AccessTokenResponse, 
 	accessTokenUrl := fmt.Sprintf(sns_oauth2_accessToken_url, appid, secret, code)
 	buf, err := goo.NewRequest().Get(accessTokenUrl)
 	if err != nil {
+		goo.Log.Error("[wx-oauth2-access-token]", err.Error())
 		return nil, err
 	}
 
 	rsp := &Oauth2AccessTokenResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
+		goo.Log.Error("[wx-oauth2-access-token]", err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
+		goo.Log.Error("[wx-oauth2-access-token]", rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
+
+	goo.Log.Error("[wx-oauth2-access-token]", rsp)
 
 	return rsp, nil
 }
@@ -77,16 +81,22 @@ func SnsUserInfo(accessToken, openid string) (*SnsUserInfoResponse, error) {
 	userInfoUrl := fmt.Sprintf(sns_userinfo_url, accessToken, openid)
 	buf, err := goo.NewRequest().Get(userInfoUrl)
 	if err != nil {
+		goo.Log.Error("[wx-sns-userinfo]", err.Error())
+
 		return nil, err
 	}
 
-	userInfo := &SnsUserInfoResponse{}
-	if err := json.Unmarshal(buf, userInfo); err != nil {
+	rsp := &SnsUserInfoResponse{}
+	if err := json.Unmarshal(buf, rsp); err != nil {
+		goo.Log.Error("[wx-sns-userinfo]", err.Error())
 		return nil, err
 	}
-	if userInfo.Errcode != 0 {
-		return nil, errors.New(userInfo.Errmsg)
+	if rsp.Errcode != 0 {
+		goo.Log.Error("[wx-sns-userinfo]", rsp.Errmsg)
+		return nil, errors.New(rsp.Errmsg)
 	}
 
-	return userInfo, nil
+	goo.Log.Error("[wx-sns-userinfo]", rsp)
+
+	return rsp, nil
 }
