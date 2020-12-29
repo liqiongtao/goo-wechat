@@ -21,7 +21,7 @@ func Oauth2AuthorizeUrl(appid, authorizeUrl, originUrl string) string {
 		redirectUrl = url.QueryEscape(authorizeUrl + "?redirect_url=" + url.QueryEscape(originUrl))
 	}
 	oauth2Url := fmt.Sprintf(oauth2_authorize_url, appid, redirectUrl, state)
-	goo.Log.Debug("[wx-h5-oauth2]", map[string]interface{}{
+	goo.Log.Debug(map[string]interface{}{
 		"authorizeUrl": authorizeUrl,
 		"originUrl":    originUrl,
 		"redirectUrl":  redirectUrl,
@@ -45,21 +45,26 @@ func Oauth2AccessToken(appid, secret, code string) (*Oauth2AccessTokenResponse, 
 	accessTokenUrl := fmt.Sprintf(sns_oauth2_accessToken_url, appid, secret, code)
 	buf, err := goo.NewRequest().Get(accessTokenUrl)
 	if err != nil {
-		goo.Log.Error("[wx-oauth2-access-token]", err.Error())
+		goo.Log.Error(err.Error())
 		return nil, err
 	}
 
 	rsp := &Oauth2AccessTokenResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
-		goo.Log.Error("[wx-oauth2-access-token]", err.Error())
+		goo.Log.Error(err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
-		goo.Log.Error("[wx-oauth2-access-token]", rsp.Errmsg)
+		goo.Log.Error(rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
 
-	goo.Log.Error("[wx-oauth2-access-token]", rsp)
+	goo.Log.
+		WithField("access_token", rsp.AccessToken).
+		WithField("expire_in", rsp.ExpiresIn).
+		WithField("openid", rsp.Openid).
+		WithField("unionid", rsp.Unionid).
+		Debug()
 
 	return rsp, nil
 }
@@ -81,22 +86,30 @@ func SnsUserInfo(accessToken, openid string) (*SnsUserInfoResponse, error) {
 	userInfoUrl := fmt.Sprintf(sns_userinfo_url, accessToken, openid)
 	buf, err := goo.NewRequest().Get(userInfoUrl)
 	if err != nil {
-		goo.Log.Error("[wx-sns-userinfo]", err.Error())
+		goo.Log.Error(err.Error())
 
 		return nil, err
 	}
 
 	rsp := &SnsUserInfoResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
-		goo.Log.Error("[wx-sns-userinfo]", err.Error())
+		goo.Log.Error(err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
-		goo.Log.Error("[wx-sns-userinfo]", rsp.Errmsg)
+		goo.Log.Error(rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
 
-	goo.Log.Error("[wx-sns-userinfo]", rsp)
+	goo.Log.
+		WithField("openid", rsp.Openid).
+		WithField("unionid", rsp.Unionid).
+		WithField("nickname", rsp.Nickname).
+		WithField("gender", rsp.Gender).
+		WithField("avatar", rsp.Avatar).
+		WithField("province", rsp.Province).
+		WithField("city", rsp.City).
+		Debug()
 
 	return rsp, nil
 }

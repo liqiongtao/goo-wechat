@@ -38,15 +38,15 @@ func (this *cgiToken) Set() error {
 	}{}
 
 	if err := json.Unmarshal(buf, &rsp); err != nil {
-		goo.Log.Error("[wx-cgi-access-token]", err.Error())
+		goo.Log.Error(err.Error())
 		return err
 	}
 	if errCode := rsp.ErrCode; errCode != 0 {
-		goo.Log.Error("[wx-cgi-access-token]", rsp.ErrMsg)
+		goo.Log.Error(rsp.ErrMsg)
 		return errors.New(rsp.ErrMsg)
 	}
 
-	goo.Log.Debug("[wx-cgi-access-token]", rsp)
+	goo.Log.WithField("access_token", rsp.AccessToken).WithField("expire_in", rsp.ExpiresIn).Debug()
 
 	key := fmt.Sprintf(cgi_token_key, this.Appid)
 	return __cache.Set(key, rsp.AccessToken, time.Duration(rsp.ExpiresIn)*time.Second).Err()
