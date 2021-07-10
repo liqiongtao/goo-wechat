@@ -66,7 +66,7 @@ func MinipUserInfo(sessionKey, encryptedData, iv string) (*MinipUserInfoResponse
 	data := utils.Base64Decode(encryptedData)
 	key := utils.Base64Decode(sessionKey)
 
-	buf, err := utils.AESCBCEncrypt(data, key, utils.Base64Decode(iv))
+	buf, err := utils.AESCBCDecrypt(data, key, utils.Base64Decode(iv))
 	if err != nil {
 		goo.Log.Error(err.Error())
 		return nil, err
@@ -89,6 +89,37 @@ func MinipUserInfo(sessionKey, encryptedData, iv string) (*MinipUserInfoResponse
 		Debug()
 
 	return rsp, nil
+}
+
+// ---------------------------------
+// -- 解析手机号
+// ---------------------------------
+
+type WXMobileData struct {
+	PhoneNumber     string `json:"phoneNumber"`
+	PurePhoneNumber string `json:"purePhoneNumber"`
+	CountryCode     string `json:"countryCode"`
+	Watermark       struct {
+		Appid     string `json:"appid"`
+		Timestamp int64  `json:"timestamp"`
+	} `json:"watermark"`
+}
+
+func MinipMobile(sessionKey, encryptedData, iv string) (*WXMobileData, error) {
+	// 解析数据
+	encryptedDataRaw := utils.Base64Decode(encryptedData)
+	ivRaw := utils.Base64Decode(iv)
+	key := utils.Base64Decode(sessionKey)
+	buf, err := utils.AESCBCDecrypt(encryptedDataRaw, key, ivRaw)
+	if err != nil {
+		return nil, err
+	}
+	// 获取手机号
+	dt := &WXMobileData{}
+	if err = json.Unmarshal(buf, dt); err != nil {
+		return nil, err
+	}
+	return dt, nil
 }
 
 // ---------------------------------
