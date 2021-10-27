@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/liqiongtao/goo"
-	"github.com/liqiongtao/goo/utils"
+	goo_http_request "github.com/liqiongtao/googo.io/goo-http-request"
+	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	goo_utils "github.com/liqiongtao/googo.io/goo-utils"
 )
 
 // ---------------------------------
@@ -22,23 +23,23 @@ type JsCode2SessionResponse struct {
 
 func JsCode2Session(appid, secret, code string) (*JsCode2SessionResponse, error) {
 	jscode2sess_url := fmt.Sprintf(sns_jsscode2sess_url, appid, secret, code)
-	buf, err := goo.NewRequest().Get(jscode2sess_url)
+	buf, err := goo_http_request.Get(jscode2sess_url)
 	if err != nil {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return nil, err
 	}
 
 	rsp := &JsCode2SessionResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
-		goo.Log.Error(rsp.Errmsg)
+		goo_log.Error(rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
 
-	goo.Log.
+	goo_log.
 		WithField("openid", rsp.Openid).
 		WithField("unionid", rsp.Unionid).
 		WithField("session_key", rsp.SessionKey).
@@ -63,22 +64,22 @@ type MinipUserInfoResponse struct {
 }
 
 func MinipUserInfo(sessionKey, encryptedData, iv string) (*MinipUserInfoResponse, error) {
-	data := utils.Base64Decode(encryptedData)
-	key := utils.Base64Decode(sessionKey)
+	data := goo_utils.Base64Decode(encryptedData)
+	key := goo_utils.Base64Decode(sessionKey)
 
-	buf, err := utils.AESCBCDecrypt(data, key, utils.Base64Decode(iv))
+	buf, err := goo_utils.AESCBCDecrypt(data, key, goo_utils.Base64Decode(iv))
 	if err != nil {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return nil, err
 	}
 
 	rsp := &MinipUserInfoResponse{}
 	if err = json.Unmarshal(buf, rsp); err != nil {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return nil, err
 	}
 
-	goo.Log.
+	goo_log.
 		WithField("openid", rsp.Openid).
 		WithField("unionid", rsp.Unionid).
 		WithField("nickname", rsp.Nickname).
@@ -107,10 +108,10 @@ type WXMobileData struct {
 
 func MinipMobile(sessionKey, encryptedData, iv string) (*WXMobileData, error) {
 	// 解析数据
-	encryptedDataRaw := utils.Base64Decode(encryptedData)
-	ivRaw := utils.Base64Decode(iv)
-	key := utils.Base64Decode(sessionKey)
-	buf, err := utils.AESCBCDecrypt(encryptedDataRaw, key, ivRaw)
+	encryptedDataRaw := goo_utils.Base64Decode(encryptedData)
+	ivRaw := goo_utils.Base64Decode(iv)
+	key := goo_utils.Base64Decode(sessionKey)
+	buf, err := goo_utils.AESCBCDecrypt(encryptedDataRaw, key, ivRaw)
 	if err != nil {
 		return nil, err
 	}
@@ -140,9 +141,9 @@ func SendTemplateMessage(appid, secret, openid, templateId, page, formId string,
 	buf, _ := json.Marshal(params)
 
 	messageTplSendUrl := fmt.Sprintf(message_tpl_send_url, accessToken)
-	buf, err := goo.NewRequest().JsonContentType().Post(messageTplSendUrl, buf)
+	buf, err := goo_http_request.PostJson(messageTplSendUrl, buf)
 	if err != nil {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return err
 	}
 
@@ -151,11 +152,11 @@ func SendTemplateMessage(appid, secret, openid, templateId, page, formId string,
 		ErrMsg  string `json:"errmsg"`
 	}{}
 	if err := json.Unmarshal(buf, rst); err != nil {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return err
 	}
 	if rst.ErrCode != 0 {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return errors.New(rst.ErrMsg)
 	}
 

@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/liqiongtao/goo"
+	goo_http_request "github.com/liqiongtao/googo.io/goo-http-request"
+	goo_log "github.com/liqiongtao/googo.io/goo-log"
 	"time"
 )
 
@@ -28,7 +29,7 @@ func (this *cgiToken) TTL() time.Duration {
 }
 
 func (this *cgiToken) Set() error {
-	buf, _ := goo.NewRequest().Get(fmt.Sprintf(cgi_token_url, this.Appid, this.Secret))
+	buf, _ := goo_http_request.Get(fmt.Sprintf(cgi_token_url, this.Appid, this.Secret))
 
 	rsp := struct {
 		AccessToken string `json:"access_token"`
@@ -38,15 +39,15 @@ func (this *cgiToken) Set() error {
 	}{}
 
 	if err := json.Unmarshal(buf, &rsp); err != nil {
-		goo.Log.Error(err.Error())
+		goo_log.Error(err.Error())
 		return err
 	}
 	if errCode := rsp.ErrCode; errCode != 0 {
-		goo.Log.Error(rsp.ErrMsg)
+		goo_log.Error(rsp.ErrMsg)
 		return errors.New(rsp.ErrMsg)
 	}
 
-	goo.Log.WithField("access_token", rsp.AccessToken).WithField("expire_in", rsp.ExpiresIn).Debug()
+	goo_log.WithField("access_token", rsp.AccessToken).WithField("expire_in", rsp.ExpiresIn).Debug()
 
 	key := fmt.Sprintf(cgi_token_key, this.Appid)
 	return __cache.Set(key, rsp.AccessToken, time.Duration(rsp.ExpiresIn)*time.Second).Err()
