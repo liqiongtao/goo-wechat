@@ -14,7 +14,7 @@ import (
 // 获取H5授权链接
 // authorizeUrl: 授权地址
 // originUrl: 授权成功后的回跳地址
-func Oauth2AuthorizeUrl(appid, authorizeUrl, originUrl string) string {
+func Oauth2AuthorizeUrl(appid, authorizeUrl, originUrl, state string) string {
 	var redirectUrl string
 	if strings.Index(authorizeUrl, "?") != -1 {
 		redirectUrl = url.QueryEscape(authorizeUrl + "&redirect_url=" + url.QueryEscape(originUrl))

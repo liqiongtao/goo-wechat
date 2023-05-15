@@ -13,7 +13,6 @@ const (
 	menu_get_url    = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=%s"
 	menu_del_url    = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=%s"
 
-	state                      = "lff272ca6d6080dc9t"
 	oauth2_authorize_url       = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_userinfo&state=%s#wechat_redirect"
 	sns_oauth2_accessToken_url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code"
 	sns_userinfo_url           = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s"
