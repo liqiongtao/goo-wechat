@@ -2,6 +2,7 @@ package goo_wechat
 
 import (
 	"fmt"
+	goo_log "github.com/liqiongtao/googo.io/goo-log"
 	goo_utils "github.com/liqiongtao/googo.io/goo-utils"
 	"net/url"
 	"strings"
@@ -18,6 +19,7 @@ func JsApi(appid, secret, urlStr string) map[string]interface{} {
 	urlStr = strings.Split(urlStr, "#")[0]
 
 	rawstr := fmt.Sprintf(jsapi_ticket_qs, ticket, nonceStr, ts, urlStr)
+	goo_log.DebugF("Wechat-JsApi: %s", rawstr)
 	rawstr = goo_utils.SHA1([]byte(rawstr))
 
 	params := map[string]interface{}{
