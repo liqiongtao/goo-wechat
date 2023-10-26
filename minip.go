@@ -124,7 +124,7 @@ func MinipMobile(sessionKey, encryptedData, iv string) (*WXMobileData, error) {
 }
 
 // ---------------------------------
-// -- 发送模板消息
+// -- 发送订阅消息
 // ---------------------------------
 
 func SendTemplateMessage(appid, secret, openid, templateId, page string, data interface{}) error {
