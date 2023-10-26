@@ -127,14 +127,13 @@ func MinipMobile(sessionKey, encryptedData, iv string) (*WXMobileData, error) {
 // -- 发送模板消息
 // ---------------------------------
 
-func SendTemplateMessage(appid, secret, openid, templateId, page, formId string, data interface{}) error {
+func SendTemplateMessage(appid, secret, openid, templateId, page string, data interface{}) error {
 	accessToken := CGIToken(appid, secret).Get()
 	params := map[string]interface{}{
 		"access_token": accessToken,
-		"touser":       openid,
 		"template_id":  templateId,
 		"page":         page,
-		"form_id":      formId,
+		"touser":       openid,
 		"data":         data,
 	}
 
