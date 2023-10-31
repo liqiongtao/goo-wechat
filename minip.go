@@ -153,7 +153,6 @@ func SendTemplateMessage(appid, secret, openid, templateId, page string, data in
 	}
 
 	if p.Get("errcode").Int() != 0 {
-		goo_log.Error(err.Error())
 		return errors.New(p.Get("errmsg").String())
 	}
 
