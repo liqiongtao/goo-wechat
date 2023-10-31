@@ -144,17 +144,20 @@ func SendTemplateMessage(appid, secret, openid, templateId, page string, data in
 		return err
 	}
 
-	goo_log.WithField("params", params.String()).WithField("result", string(b)).Debug("发送订阅消息")
+	l := goo_log.WithField("params", params.String()).WithField("result", string(b))
 
 	p, err := goo_utils.Byte(b).Params()
 	if err != nil {
-		goo_log.Error(err.Error())
+		l.Error("发送订阅消息", err)
 		return err
 	}
 
 	if p.Get("errcode").Int() != 0 {
+		l.Error("发送订阅消息")
 		return errors.New(p.Get("errmsg").String())
 	}
+
+	l.Debug("发送订阅消息")
 
 	return nil
 }
