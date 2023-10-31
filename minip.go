@@ -129,7 +129,7 @@ func MinipMobile(sessionKey, encryptedData, iv string) (*WXMobileData, error) {
 
 func SendTemplateMessage(appid, secret, openid, templateId, page string, data interface{}) error {
 	accessToken := CGIToken(appid, secret).Get()
-	params := map[string]interface{}{
+	params := goo_utils.M{
 		"access_token": accessToken,
 		"template_id":  templateId,
 		"page":         page,
@@ -137,26 +137,24 @@ func SendTemplateMessage(appid, secret, openid, templateId, page string, data in
 		"data":         data,
 	}
 
-	buf, _ := json.Marshal(params)
-
 	messageTplSendUrl := fmt.Sprintf(message_tpl_send_url, accessToken)
-	buf, err := goo_http_request.PostJson(messageTplSendUrl, buf)
+	b, err := goo_http_request.PostJson(messageTplSendUrl, params.Json())
 	if err != nil {
 		goo_log.Error(err.Error())
 		return err
 	}
 
-	rst := struct {
-		ErrCode int    `json:"errcode"`
-		ErrMsg  string `json:"errmsg"`
-	}{}
-	if err := json.Unmarshal(buf, rst); err != nil {
+	goo_log.WithField("params", params.String()).WithField("result", string(b)).Debug("发送订阅消息")
+
+	p, err := goo_utils.Byte(b).Params()
+	if err != nil {
 		goo_log.Error(err.Error())
 		return err
 	}
-	if rst.ErrCode != 0 {
+
+	if p.Get("errcode").Int() != 0 {
 		goo_log.Error(err.Error())
-		return errors.New(rst.ErrMsg)
+		return errors.New(p.Get("errmsg").String())
 	}
 
 	return nil
