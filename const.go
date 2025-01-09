@@ -19,4 +19,6 @@ const (
 	sns_jsscode2sess_url       = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code"
 
 	message_tpl_send_url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=%s"
+
+	getwxacodeunlimit_url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=%s"
 )
