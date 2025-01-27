@@ -28,7 +28,7 @@ func JsApi(appid, secret, urlStr string) map[string]interface{} {
 		"timestamp": ts,
 		"nonceStr":  nonceStr,
 		"signature": rawstr,
-		"jsApiList": []string{"checkJsApi", "onMenuShareTimeline", "onMenuShareAppMessage", "chooseWXPay",
+		"jsApiList": []string{"checkJsApi", "updateAppMessageShareData", "updateTimelineShareData", "onMenuShareTimeline", "onMenuShareAppMessage", "chooseWXPay",
 			"openLocation", "getLocation", "chooseImage", "previewImage", "uploadImage", "downloadImage",
 			"startRecord", "stopRecord", "onVoiceRecordEnd", "playVoice", "pauseVoice", "stopVoice",
 			"onVoicePlayEnd", "uploadVoice", "downloadVoice", "translateVoice", "getNetworkType", "scanQRCode",
