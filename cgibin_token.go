@@ -1,11 +1,11 @@
-package goo_wechat
+package goowechat
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	goo_http_request "github.com/liqiongtao/googo.io/goo-http-request"
-	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	goolog "github.com/liqiongtao/googo.io/goo-log"
+	goorequest "github.com/liqiongtao/googo.io/goo-request"
 	"time"
 )
 
@@ -29,7 +29,7 @@ func (this *cgiToken) TTL() time.Duration {
 }
 
 func (this *cgiToken) Set() error {
-	buf, _ := goo_http_request.Get(fmt.Sprintf(cgi_token_url, this.Appid, this.Secret))
+	buf, _ := goorequest.Get(fmt.Sprintf(cgi_token_url, this.Appid, this.Secret))
 
 	rsp := struct {
 		AccessToken string `json:"access_token"`
@@ -39,15 +39,15 @@ func (this *cgiToken) Set() error {
 	}{}
 
 	if err := json.Unmarshal(buf, &rsp); err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return err
 	}
 	if errCode := rsp.ErrCode; errCode != 0 {
-		goo_log.Error(rsp.ErrMsg)
+		goolog.Error(rsp.ErrMsg)
 		return errors.New(rsp.ErrMsg)
 	}
 
-	goo_log.WithField("access_token", rsp.AccessToken).WithField("expire_in", rsp.ExpiresIn).Debug()
+	goolog.WithField("access_token", rsp.AccessToken).WithField("expire_in", rsp.ExpiresIn).Debug()
 
 	key := fmt.Sprintf(cgi_token_key, this.Appid)
 	return __cache.Set(key, rsp.AccessToken, time.Duration(rsp.ExpiresIn)*time.Second).Err()

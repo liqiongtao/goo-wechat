@@ -1,4 +1,4 @@
-package goo_wechat
+package goowechat
 
 type Config struct {
 	Appid        string `yaml:"appid"`

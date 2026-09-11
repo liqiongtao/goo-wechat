@@ -1,11 +1,11 @@
-package goo_wechat
+package goowechat
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	goo_http_request "github.com/liqiongtao/googo.io/goo-http-request"
-	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	goolog "github.com/liqiongtao/googo.io/goo-log"
+	goorequest "github.com/liqiongtao/googo.io/goo-request"
 	"time"
 )
 
@@ -30,7 +30,7 @@ func (this *cgiTicket) TTL() time.Duration {
 
 func (this *cgiTicket) Set() error {
 	accessToken := CGIToken(this.Appid, this.Secret).Get()
-	buf, _ := goo_http_request.Get(fmt.Sprintf(cgi_ticket_url, accessToken))
+	buf, _ := goorequest.Get(fmt.Sprintf(cgi_ticket_url, accessToken))
 
 	rsp := struct {
 		Ticket    string `json:"ticket"`
@@ -46,7 +46,7 @@ func (this *cgiTicket) Set() error {
 		return errors.New(rsp.ErrMsg)
 	}
 
-	goo_log.WithField("ticket", rsp.Ticket).WithField("expire_in", rsp.ExpiresIn).Debug()
+	goolog.WithField("ticket", rsp.Ticket).WithField("expire_in", rsp.ExpiresIn).Debug()
 
 	key := fmt.Sprintf(cgi_ticket_key, this.Appid)
 	return __cache.Set(key, rsp.Ticket, time.Duration(rsp.ExpiresIn)*time.Second).Err()

@@ -1,11 +1,11 @@
-package goo_wechat
+package goowechat
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	goo_http_request "github.com/liqiongtao/googo.io/goo-http-request"
-	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	goolog "github.com/liqiongtao/googo.io/goo-log"
+	goorequest "github.com/liqiongtao/googo.io/goo-request"
 	"net/url"
 	"strings"
 	"time"
@@ -22,7 +22,7 @@ func Oauth2AuthorizeUrl(appid, authorizeUrl, originUrl, state string) string {
 		redirectUrl = url.QueryEscape(authorizeUrl + "?redirect_url=" + url.QueryEscape(originUrl))
 	}
 	oauth2Url := fmt.Sprintf(oauth2_authorize_url, appid, redirectUrl, state)
-	goo_log.Debug(map[string]interface{}{
+	goolog.Debug(map[string]interface{}{
 		"authorizeUrl": authorizeUrl,
 		"originUrl":    originUrl,
 		"redirectUrl":  redirectUrl,
@@ -44,23 +44,23 @@ type Oauth2AccessTokenResponse struct {
 
 func Oauth2AccessToken(appid, secret, code string) (*Oauth2AccessTokenResponse, error) {
 	accessTokenUrl := fmt.Sprintf(sns_oauth2_accessToken_url, appid, secret, code)
-	buf, err := goo_http_request.Get(accessTokenUrl)
+	buf, err := goorequest.Get(accessTokenUrl)
 	if err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return nil, err
 	}
 
 	rsp := &Oauth2AccessTokenResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
-		goo_log.Error(rsp.Errmsg)
+		goolog.Error(rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
 
-	goo_log.
+	goolog.
 		WithField("access_token", rsp.AccessToken).
 		WithField("expire_in", rsp.ExpiresIn).
 		WithField("openid", rsp.Openid).
@@ -85,24 +85,24 @@ type SnsUserInfoResponse struct {
 
 func SnsUserInfo(accessToken, openid string) (*SnsUserInfoResponse, error) {
 	userInfoUrl := fmt.Sprintf(sns_userinfo_url, accessToken, openid)
-	buf, err := goo_http_request.Get(userInfoUrl)
+	buf, err := goorequest.Get(userInfoUrl)
 	if err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 
 		return nil, err
 	}
 
 	rsp := &SnsUserInfoResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
-		goo_log.Error(rsp.Errmsg)
+		goolog.Error(rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
 
-	goo_log.
+	goolog.
 		WithField("openid", rsp.Openid).
 		WithField("unionid", rsp.Unionid).
 		WithField("nickname", rsp.Nickname).

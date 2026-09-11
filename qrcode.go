@@ -1,12 +1,12 @@
-package goo_wechat
+package goowechat
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	goo_http_request "github.com/liqiongtao/googo.io/goo-http-request"
-	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	goolog "github.com/liqiongtao/googo.io/goo-log"
+	goorequest "github.com/liqiongtao/googo.io/goo-request"
 	goo_utils "github.com/liqiongtao/googo.io/goo-utils"
 )
 
@@ -41,9 +41,9 @@ func Qrcode(appid, secret string, params QrcodeParams) (string, error) {
 	accessToken := CGIToken(appid, secret).Get()
 
 	urlstr := fmt.Sprintf(getwxacodeunlimit_url, accessToken)
-	b, err := goo_http_request.PostJson(urlstr, params.Json())
+	b, err := goorequest.PostJson(urlstr, params.Json())
 	if err != nil {
-		goo_log.Error(err)
+		goolog.Error(err)
 		return "", err
 	}
 
@@ -52,7 +52,7 @@ func Qrcode(appid, secret string, params QrcodeParams) (string, error) {
 		ErrMsg  string `json:"errmsg"`
 	}
 	if err = json.Unmarshal(b, &errResp); err == nil && errResp.ErrCode != 0 {
-		goo_log.Error(string(b))
+		goolog.Error(string(b))
 		return "", errors.New(errResp.ErrMsg)
 	}
 

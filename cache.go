@@ -1,11 +1,13 @@
-package goo_wechat
+package goowechat
 
-import "github.com/go-redis/redis"
-
-var (
-	__cache *redis.Client
+import (
+	gooredis "github.com/liqiongtao/googo.io/goo-redis"
 )
 
-func InitCache(redisClient *redis.Client) {
+var (
+	__cache *gooredis.Client
+)
+
+func InitCache(redisClient *gooredis.Client) {
 	__cache = redisClient
 }

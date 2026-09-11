@@ -1,4 +1,4 @@
-package goo_wechat
+package goowechat
 
 const (
 	cgi_token_key = "wx:cgi:token:%s"

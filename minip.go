@@ -1,11 +1,11 @@
-package goo_wechat
+package goowechat
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	goo_http_request "github.com/liqiongtao/googo.io/goo-http-request"
-	goo_log "github.com/liqiongtao/googo.io/goo-log"
+	goolog "github.com/liqiongtao/googo.io/goo-log"
+	goorequest "github.com/liqiongtao/googo.io/goo-request"
 	goo_utils "github.com/liqiongtao/googo.io/goo-utils"
 )
 
@@ -23,23 +23,23 @@ type JsCode2SessionResponse struct {
 
 func JsCode2Session(appid, secret, code string) (*JsCode2SessionResponse, error) {
 	jscode2sess_url := fmt.Sprintf(sns_jsscode2sess_url, appid, secret, code)
-	buf, err := goo_http_request.Get(jscode2sess_url)
+	buf, err := goorequest.Get(jscode2sess_url)
 	if err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return nil, err
 	}
 
 	rsp := &JsCode2SessionResponse{}
 	if err := json.Unmarshal(buf, rsp); err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return nil, err
 	}
 	if rsp.Errcode != 0 {
-		goo_log.Error(rsp.Errmsg)
+		goolog.Error(rsp.Errmsg)
 		return nil, errors.New(rsp.Errmsg)
 	}
 
-	goo_log.
+	goolog.
 		WithField("openid", rsp.Openid).
 		WithField("unionid", rsp.Unionid).
 		WithField("session_key", rsp.SessionKey).
@@ -69,17 +69,17 @@ func MinipUserInfo(sessionKey, encryptedData, iv string) (*MinipUserInfoResponse
 
 	buf, err := goo_utils.AESCBCDecrypt(data, key, goo_utils.Base64Decode(iv))
 	if err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return nil, err
 	}
 
 	rsp := &MinipUserInfoResponse{}
 	if err = json.Unmarshal(buf, rsp); err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return nil, err
 	}
 
-	goo_log.
+	goolog.
 		WithField("openid", rsp.Openid).
 		WithField("unionid", rsp.Unionid).
 		WithField("nickname", rsp.Nickname).
@@ -138,13 +138,13 @@ func SendTemplateMessage(appid, secret, openid, templateId, page string, data in
 	}
 
 	messageTplSendUrl := fmt.Sprintf(message_tpl_send_url, accessToken)
-	b, err := goo_http_request.PostJson(messageTplSendUrl, params.Json())
+	b, err := goorequest.PostJson(messageTplSendUrl, params.Json())
 	if err != nil {
-		goo_log.Error(err.Error())
+		goolog.Error(err.Error())
 		return err
 	}
 
-	l := goo_log.WithField("params", params.String()).WithField("result", string(b))
+	l := goolog.WithField("params", params.String()).WithField("result", string(b))
 
 	p, err := goo_utils.Byte(b).Params()
 	if err != nil {
